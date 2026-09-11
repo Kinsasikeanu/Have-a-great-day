@@ -1,0 +1,666 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#fff7f5" />
+  <title>Digital Flowers For You</title>
+
+  <style>
+    :root {
+      --bg-top: #fff8f6;
+      --bg-bottom: #f4eee8;
+      --text: #3f3335;
+      --muted: #7d6d70;
+      --pink: #e58c9d;
+      --pink-light: #f4b7c1;
+      --coral: #e87f72;
+      --coral-light: #f6aea3;
+      --yellow: #e7b95f;
+      --green: #708c69;
+      --green-light: #8eaa84;
+      --card: rgba(255, 255, 255, 0.72);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: var(--text);
+      font-family: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 18% 10%, rgba(244, 183, 193, 0.34), transparent 29%),
+        radial-gradient(circle at 85% 18%, rgba(231, 185, 95, 0.14), transparent 25%),
+        linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.045;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.4'/%3E%3C/svg%3E");
+    }
+
+    .page {
+      position: relative;
+      width: min(100%, 430px);
+      min-height: 100svh;
+      padding: 28px 20px calc(24px + env(safe-area-inset-bottom));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 380px;
+      padding: 33px 22px 27px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.84);
+      border-radius: 32px;
+      background: var(--card);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow:
+        0 28px 70px rgba(89, 65, 69, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      animation: appear 0.8s ease both;
+    }
+
+    .eyebrow {
+      margin-bottom: 11px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(35px, 9.5vw, 41px);
+      font-weight: 500;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    h1 em {
+      color: #bd6478;
+      font-weight: 500;
+    }
+
+    .subtext {
+      max-width: 270px;
+      margin: 12px auto 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .bouquet-button {
+      position: relative;
+      display: block;
+      width: 250px;
+      height: 258px;
+      margin: 10px auto 1px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      touch-action: manipulation;
+      filter: drop-shadow(0 17px 16px rgba(76, 66, 57, 0.09));
+    }
+
+    .bouquet {
+      position: absolute;
+      inset: 0;
+      transform-origin: 50% 88%;
+      transition: transform 0.3s ease;
+    }
+
+    .bouquet-button:active .bouquet {
+      transform: scale(0.97);
+    }
+
+    .bouquet.celebrate {
+      animation: bouquetWave 0.9s ease;
+    }
+
+    .stem {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      width: 5px;
+      height: 155px;
+      border-radius: 999px;
+      background: linear-gradient(var(--green-light), var(--green));
+      transform-origin: bottom center;
+    }
+
+    .s1 { transform: translateX(-50%) rotate(-18deg); }
+    .s2 { transform: translateX(-50%) rotate(-9deg); }
+    .s3 { transform: translateX(-50%) rotate(1deg); }
+    .s4 { transform: translateX(-50%) rotate(11deg); }
+    .s5 { transform: translateX(-50%) rotate(21deg); }
+
+    .leaf {
+      position: absolute;
+      bottom: 77px;
+      left: 50%;
+      width: 49px;
+      height: 17px;
+      border-radius: 100% 0 100% 0;
+      background: linear-gradient(90deg, var(--green), var(--green-light));
+      transform-origin: left center;
+      opacity: 0.98;
+    }
+
+    .l1 { bottom: 70px; transform: translateX(-6px) rotate(-161deg); }
+    .l2 { bottom: 98px; transform: translateX(3px) rotate(18deg); }
+    .l3 { bottom: 120px; transform: translateX(-3px) rotate(-168deg) scale(0.85); }
+    .l4 { bottom: 137px; transform: translateX(3px) rotate(24deg) scale(0.8); }
+
+    .tulip {
+      position: absolute;
+      width: 58px;
+      height: 66px;
+      transform-origin: 50% 100%;
+      animation: flowerFloat 4.2s ease-in-out infinite;
+    }
+
+    .tulip .cup {
+      position: absolute;
+      left: 4px;
+      top: 8px;
+      width: 50px;
+      height: 48px;
+      overflow: hidden;
+      border-radius: 9px 9px 25px 25px;
+    }
+
+    .tulip .cup::before,
+    .tulip .cup::after,
+    .tulip .middle {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 31px;
+      height: 47px;
+      border-radius: 24px 24px 20px 20px;
+      transform-origin: bottom center;
+    }
+
+    .tulip .cup::before {
+      left: -2px;
+      transform: rotate(-18deg);
+      background: linear-gradient(150deg, var(--pink-light), var(--pink));
+    }
+
+    .tulip .cup::after {
+      right: -2px;
+      transform: rotate(18deg);
+      background: linear-gradient(210deg, var(--pink-light), var(--pink));
+    }
+
+    .tulip .middle {
+      z-index: 2;
+      left: 14px;
+      top: 5px;
+      background: linear-gradient(180deg, #f5c1ca, #dc758a);
+      clip-path: polygon(
+        50% 20%,
+        100% 0,
+        93% 70%,
+        73% 100%,
+        27% 100%,
+        7% 70%,
+        0 0
+      );
+    }
+
+    .tulip.coral .cup::before,
+    .tulip.coral .cup::after {
+      background: linear-gradient(150deg, var(--coral-light), var(--coral));
+    }
+
+    .tulip.coral .middle {
+      background: linear-gradient(180deg, #fac4bb, #df7164);
+    }
+
+    .tulip.cream .cup::before,
+    .tulip.cream .cup::after {
+      background: linear-gradient(150deg, #fff8e7, #ebd69b);
+    }
+
+    .tulip.cream .middle {
+      background: linear-gradient(180deg, #fff8e8, #e6c873);
+    }
+
+    .t1 {
+      left: 96px;
+      top: 12px;
+    }
+
+    .t2 {
+      left: 44px;
+      top: 54px;
+      transform: scale(0.92) rotate(-8deg);
+      animation-delay: -1.2s;
+    }
+
+    .t3 {
+      right: 35px;
+      top: 58px;
+      transform: scale(0.94) rotate(8deg);
+      animation-delay: -2.1s;
+    }
+
+    .t4 {
+      left: 87px;
+      top: 91px;
+      transform: scale(0.78) rotate(-5deg);
+      animation-delay: -0.6s;
+    }
+
+    .t5 {
+      right: 74px;
+      top: 100px;
+      transform: scale(0.72) rotate(8deg);
+      animation-delay: -2.9s;
+    }
+
+    .wrap-knot {
+      position: absolute;
+      left: 84px;
+      bottom: 18px;
+      width: 84px;
+      height: 34px;
+      border-top: 12px solid rgba(215, 181, 109, 0.86);
+      border-radius: 50%;
+      transform: rotate(-4deg);
+    }
+
+    .wrap-knot::after {
+      content: "";
+      position: absolute;
+      left: 33px;
+      top: -11px;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: #d8b46b;
+    }
+
+    .hint {
+      margin-top: -2px;
+      color: #9a8589;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+
+    .wish {
+      margin: 13px 0 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 22px;
+      line-height: 1.3;
+    }
+
+    .tiny {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .spark {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(215, 181, 109, 0.56);
+      animation: drift 5.6s ease-in-out infinite;
+    }
+
+    .spark.one {
+      left: 18px;
+      top: 18%;
+    }
+
+    .spark.two {
+      right: 23px;
+      top: 24%;
+      width: 5px;
+      height: 5px;
+      animation-delay: -1.7s;
+    }
+
+    .spark.three {
+      left: 38px;
+      bottom: 17%;
+      width: 5px;
+      height: 5px;
+      animation-delay: -3.5s;
+    }
+
+    .spark.four {
+      right: 36px;
+      bottom: 13%;
+      animation-delay: -2.4s;
+    }
+
+    .heart {
+      position: fixed;
+      z-index: 10;
+      pointer-events: none;
+      font-size: 16px;
+      opacity: 0;
+      animation: heartFloat 1.8s ease-out forwards;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.985);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes flowerFloat {
+      0%,
+      100% {
+        translate: 0 0;
+      }
+
+      50% {
+        translate: 0 -4px;
+      }
+    }
+
+    @keyframes drift {
+      0%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.3;
+      }
+
+      50% {
+        transform: translateY(-17px);
+        opacity: 0.8;
+      }
+    }
+
+    @keyframes bouquetWave {
+      0%,
+      100% {
+        transform: rotate(0deg) scale(1);
+      }
+
+      25% {
+        transform: rotate(-3deg) scale(1.02);
+      }
+
+      55% {
+        transform: rotate(3deg) scale(1.02);
+      }
+
+      78% {
+        transform: rotate(-1deg);
+      }
+    }
+
+    @keyframes heartFloat {
+      0% {
+        transform: translate(-50%, 0) scale(0.6) rotate(0deg);
+        opacity: 0;
+      }
+
+      15% {
+        opacity: 0.9;
+      }
+
+      100% {
+        transform:
+          translate(calc(-50% + var(--drift)), -115px)
+          scale(1.15)
+          rotate(var(--spin));
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 370px) {
+      .card {
+        padding-inline: 17px;
+      }
+
+      .bouquet-button {
+        transform: scale(0.93);
+        margin-top: 4px;
+        margin-bottom: -8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="grain" aria-hidden="true"></div>
+
+  <main class="page">
+
+    <span class="spark one" aria-hidden="true"></span>
+    <span class="spark two" aria-hidden="true"></span>
+    <span class="spark three" aria-hidden="true"></span>
+    <span class="spark four" aria-hidden="true"></span>
+
+    <section
+      class="card"
+      aria-label="A digital bouquet and a good day message"
+    >
+
+      <div class="eyebrow">
+        a little something for you
+      </div>
+
+      <h1>
+        Digital flowers<br>
+        <em>for you.</em>
+      </h1>
+
+      <p class="subtext">
+        Tiny bouquet for your screen.
+      </p>
+
+      <button
+        class="bouquet-button"
+        id="bouquetButton"
+        aria-label="Tap the digital tulips"
+      >
+
+        <div class="bouquet" id="bouquet" aria-hidden="true">
+
+          <div class="stem s1"></div>
+          <div class="stem s2"></div>
+          <div class="stem s3"></div>
+          <div class="stem s4"></div>
+          <div class="stem s5"></div>
+
+          <div class="leaf l1"></div>
+          <div class="leaf l2"></div>
+          <div class="leaf l3"></div>
+          <div class="leaf l4"></div>
+
+          <div class="tulip t1">
+            <div class="cup">
+              <span class="middle"></span>
+            </div>
+          </div>
+
+          <div class="tulip coral t2">
+            <div class="cup">
+              <span class="middle"></span>
+            </div>
+          </div>
+
+          <div class="tulip cream t3">
+            <div class="cup">
+              <span class="middle"></span>
+            </div>
+          </div>
+
+          <div class="tulip t4">
+            <div class="cup">
+              <span class="middle"></span>
+            </div>
+          </div>
+
+          <div class="tulip coral t5">
+            <div class="cup">
+              <span class="middle"></span>
+            </div>
+          </div>
+
+          <div class="wrap-knot"></div>
+
+        </div>
+
+      </button>
+
+      <div class="hint">
+        tap the flowers ♡
+      </div>
+
+      <p class="wish">
+        Have a great day ♡
+      </p>
+
+      <p class="tiny">
+        Sorry for not responding yesterday. This is me tryna match your energy in my own way.
+      </p>
+
+    </section>
+
+  </main>
+
+  <script>
+    const bouquetButton =
+      document.getElementById("bouquetButton");
+
+    const bouquet =
+      document.getElementById("bouquet");
+
+    bouquetButton.addEventListener("click", () => {
+
+      bouquet.classList.remove("celebrate");
+
+      void bouquet.offsetWidth;
+
+      bouquet.classList.add("celebrate");
+
+      const rect =
+        bouquetButton.getBoundingClientRect();
+
+      const symbols = [
+        "♡",
+        "♥",
+        "✦",
+        "♡",
+        "✧"
+      ];
+
+      for (let i = 0; i < 7; i++) {
+
+        const heart =
+          document.createElement("span");
+
+        heart.className = "heart";
+
+        heart.textContent =
+          symbols[
+            Math.floor(
+              Math.random() * symbols.length
+            )
+          ];
+
+        const x =
+          rect.left +
+          rect.width *
+          (0.28 + Math.random() * 0.44);
+
+        const y =
+          rect.top +
+          rect.height *
+          (0.48 + Math.random() * 0.18);
+
+        const drift =
+          `${Math.round(
+            -42 + Math.random() * 84
+          )}px`;
+
+        const spin =
+          `${Math.round(
+            -22 + Math.random() * 44
+          )}deg`;
+
+        heart.style.left = `${x}px`;
+        heart.style.top = `${y}px`;
+
+        heart.style.setProperty(
+          "--drift",
+          drift
+        );
+
+        heart.style.setProperty(
+          "--spin",
+          spin
+        );
+
+        heart.style.animationDelay =
+          `${i * 0.04}s`;
+
+        heart.style.color =
+          i % 3 === 0
+            ? "#d7b56d"
+            : "#d47b8f";
+
+        document.body.appendChild(heart);
+
+        setTimeout(
+          () => heart.remove(),
+          2100
+        );
+
+      }
+
+    });
+  </script>
+
+</body>
+</html>
